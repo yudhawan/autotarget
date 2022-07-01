@@ -1,12 +1,28 @@
-import {StopIcon,TrashIcon,SwitchVerticalIcon,ClockIcon,PlayIcon} from '@heroicons/react/outline'
+import {StopIcon,TrashIcon,SwitchVerticalIcon,ClockIcon,PlayIcon,XIcon} from '@heroicons/react/outline'
 import TargetImage from './target.png'
 import TargetImageDown from './target_down.png'
 import { useEffect, useState, } from 'react';
 function App() {
-  const [target,settarget]=useState(()=>[])
-  const [play,setplay]=useState(()=>false)
-  const [timer,settimer]=useState(()=>null)
+  const [target,settarget]=useState([])
+  const [play,setplay]=useState(false)
+  const [timer,settimer]=useState(null)
+  const [save,setsave]=useState([])
+  const [namasesi,setnamasesi] = useState('')
+  const [selected,setselected] = useState('')
+  const [validation,setvalidation] = useState('')
   const [ip,setip]=useState(()=>null)
+  function validationSession(){
+    if(target.length<1) return setvalidation('Tidak ada yang bisa disimpan')
+    if(save.find(val => val.nama===namasesi)) return setvalidation('Nama sudah ada')
+    if(namasesi==='' || namasesi===null) return setvalidation('Isi nama dulu')
+    setvalidation('')
+    setnamasesi('')
+    return setsave([...save, {nama:namasesi,target:target}])
+  }
+  function deleteSession(nama){
+    let data = save.filter(val => val.nama!==nama)
+    setsave(data)
+  }
   const drop = e =>{
     e.preventDefault();
     var x = e.clientX - 20 - e.target.offsetLeft+'px'
@@ -43,9 +59,6 @@ function App() {
     setplay(false)
     
   }
-  useEffect(()=>{
-    
-  },[])
   return (
   <>
   <div className="lg:px-24 px-4 flex justify-center w-full h-[100vh] bg-black z-10">
@@ -106,12 +119,13 @@ function App() {
           </div>
         </div>
         <div className='flex space-x-2 w-full h-40 justify-center items-center border-y border-slate-500 cursor-pointer'>
-          {!play&&<PlayIcon className={`rounded-full bg-green-400 text-white w-14 h-14 p-1 `} onClick={playAction}/>}
+          {!play&&<PlayIcon className={`rounded-full bg-indigo-400 text-white w-14 h-14 p-1 `} onClick={playAction}/>}
           {play&&<StopIcon className={`rounded-full bg-red-400 text-white w-14 h-14 p-1 `} onClick={stopAction}/>}
           {play?<p className='text-gray-300 text-2xl select-none'>Stop</p>:<p className='text-gray-300 text-2xl select-none'>Play</p>}
           {/* <CogIcon className={`rounded-full bg-gray-400 text-white w-7 h-7 p-1 cursor-pointer`} />   */}
         </div>
         <div className='w-full h-full flex flex-col relative overflow-y-auto px-2 space-y-1'>
+          <p className='underline text-sm text-slate-400 self-end cursor-pointer' onClick={()=>settarget([])}>Clear</p>
           {target?.map(item=>
           <div className='flex justify-between px-2 py-1 rounded-md border border-slate-400 w-full h-auto' >
             <p className='text-xs font-semibold text-gray-300 select-none cursor-pointer' onClick={()=>setip(item.id)}>Target {item.id}</p>
@@ -124,6 +138,23 @@ function App() {
               <TrashIcon className={`rounded-full bg-red-400 text-white w-5 h-5 p-1 cursor-pointer`} onClick={()=>deleteTarget(item.id)}/>
             </div>
           </div>)}
+        </div>
+        <div className='w-full h-[35rem] border-t border-white p-2 flex flex-col items-center space-y-1'>
+          <p className='text-white'>Save Session </p>
+          <div className='p-1 rounded-lg border border-violet-200 w-36 bg-white'><input className='outline-none w-full' value={namasesi} placeholder="Nama" type="text" onChange={(e)=> setnamasesi(e.target.value)}/></div>
+          {validation&&<p className='text-sm text-red-400'>{validation}</p>}
+          <button className='bg-green-400 rounded-lg px-2 text-white font-semibold' onClick={validationSession}>Save</button>
+          <div className='mt-1 flex flex-wrap gap-2 w-full'>
+            {
+              save?.map((val,index)=><div key={index} onClick={()=>{
+                setselected(val.nama)
+                settarget(val.target)
+              }} className={`mt-2 cursor-pointer rounded-lg flex items-center space-x-1 px-2 ${selected===val.nama?'text-white bg-orange-400':'text-gray-500 bg-violet-100'}`}>
+                <p>{val.nama}</p>
+                <XIcon className={`${selected===val.nama?'text-white bg-red-400':'text-gray-500'} rounded-full w-4 h-4`} onClick={()=>deleteSession(val.nama)}/>
+                </div>)
+            }
+          </div>
         </div>
       </div>
 
