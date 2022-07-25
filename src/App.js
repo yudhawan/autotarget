@@ -67,13 +67,18 @@ function App() {
   }
   const stopAction = ()=> {
     setplay(false)
+    let newdata = target.map(val => {
+      return {id:val.id,top:val.top,left:val.left,status:false,time:val.time,ip:val.ip, timerRun:val.timerRun}
+    })
+    settarget(newdata)
+
   }
-  useEffect(()=>{
-    play&&setInterval(playAction,target.length*1000)
-  },[play])
+  // useEffect(()=>{
+  //   play&&setInterval(playAction,target.length*1000)
+  // },[play])
   return (
   <>
-  <div className="lg:px-24 px-4 flex justify-center w-full h-[100vh] bg-black z-10">
+  <div className="lg:px-16 px-4 flex justify-center w-full h-[100vh] bg-black z-10">
     <div className="flex justify-between w-full h-full border border-slate-400 divide-x divide-gray-400">
       {/* map */}
       <div className="w-[85%] h-full flex justify-center flex-wrap items-end overflow-auto relative " onDrop={drop} onDragOver={dragOver}>
@@ -137,7 +142,10 @@ function App() {
           </div> */}
         </div>
         <div className='flex space-x-2 w-full h-40 justify-center items-center border-y border-slate-500'>
-          {!play&&<PlayIcon className={`rounded-full bg-indigo-400 text-white w-14 h-14 p-1 cursor-pointer`} onClick={()=>playAction()}/>}
+          {!play&&<PlayIcon className={`rounded-full bg-indigo-400 text-white w-14 h-14 p-1 cursor-pointer`} onClick={()=>{
+            playAction()
+            setplay(true)
+            }}/>}
           {play&&<StopIcon className={`rounded-full bg-red-400 text-white w-14 h-14 p-1 cursor-pointer`} onClick={stopAction}/>}
           {play?<p className='text-gray-300 text-2xl select-none'>Stop</p>:<p className='text-gray-300 text-2xl select-none'>Play</p>}
           {/* <CogIcon className={`rounded-full bg-gray-400 text-white w-7 h-7 p-1 cursor-pointer`} />   */}
